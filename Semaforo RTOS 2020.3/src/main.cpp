@@ -30,7 +30,7 @@ static THD_FUNCTION(ThreadContador, tempocontador)
 {//Declara a função do Thread
 
   (void)arg;
-  
+
    while(true)
     {
       if (tempocontador>0)
@@ -39,7 +39,13 @@ static THD_FUNCTION(ThreadContador, tempocontador)
         tempocontador = 0;
       }
       chThdSleepMilliseconds(1000);   //Período aproximado da thread
+
     }
+
+  digitalWrite(LED_BUILTIN, HIGH);
+  tempocontador = 500;
+  digitalWrite(LED_BUILTIN, LOW);
+  tempocontador = 500;
 }
 
 
