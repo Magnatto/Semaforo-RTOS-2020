@@ -1,5 +1,4 @@
-#include <Arduino.h>  //Biblioteca para funções do Arduino
-#include "ChRt.h"   //Biblioteca para uso do ChibiOS
+#include <Arduino.h>
 
 // Pino LED_BUILTIN no Arduino usualmente é o 13.
 
@@ -14,7 +13,10 @@ bool presencaSecundario = FALSE;
 #define tamanhoThread2 64
 #define tamanhoThread3 64
 
-uint8_t state = 0;
+
+const int Led1PrincipalVermelho =  6; 
+const int Led2PrincipalAmarelo =  7;
+const int Led3PrincipalVerde =  8;     
 
 //------------------------------------------------------------------------------
 // Thread 3, leitura da entrada
@@ -56,6 +58,8 @@ void chSetup() {
 void setup() {
   
   Serial.begin(9600);
+  
+  // Inicializando entradas:
   pinMode(PEDESTRE, INPUT_PULLUP);
   pinMode(SECUNDARIO, INPUT_PULLUP);
 
