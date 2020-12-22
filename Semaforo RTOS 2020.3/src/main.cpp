@@ -38,6 +38,26 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
+//------------------------------------------------------------------------------
+//                                Thread Contador                             //
+//------------------------------------------------------------------------------
+
+//Declara área de trabalho e tamanho da memória alocada a essa área
+static THD_WORKING_AREA(waThreadContador, tamanhoThreadContador); 
+
+static THD_FUNCTION(ThreadContador, tempocontador) 
+{//Declara a função do Thread
+
+   while(true)
+    {
+      if (tempocontador>0)
+      {
+        chThdSleepMilliseconds(tempocontador);  //Timer de tempocontador milisegundos
+        tempocontador = 0;
+      }
+      chThdSleepMilliseconds(1000);   //Período aproximado da thread
+    }
+}
 
 
 
