@@ -18,6 +18,31 @@ const int Led1PrincipalVermelho =  6;
 const int Led2PrincipalAmarelo =  7;
 const int Led3PrincipalVerde =  8;     
 
+
+//------------------------------------------------------------------------------
+//                              Thread 2: Contador                            //
+//------------------------------------------------------------------------------
+//Realiza os tempos de espera de cada estado
+
+static THD_WORKING_AREA(waThread2, tamanhoThread2); 
+
+static THD_FUNCTION(ThreadContador, tempocontador) 
+{//Declara a função do Thread
+
+  (void)arg;
+  
+   while(true)
+    {
+      if (tempocontador>0)
+      {
+        chThdSleepMilliseconds(tempocontador);  //Timer de tempocontador milisegundos
+        tempocontador = 0;
+      }
+      chThdSleepMilliseconds(1000);   //Período aproximado da thread
+    }
+}
+
+
 //------------------------------------------------------------------------------
 // Thread 3, leitura da entrada
 //
