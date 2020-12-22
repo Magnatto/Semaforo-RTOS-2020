@@ -1,64 +1,74 @@
 #include <Arduino.h>
 
-// Setar entradas e saídas:
-const int sensorsecundaria = 2;
-const int sensorpedestre = 3;
+// Pino LED_BUILTIN no Arduino usualmente é o 13.
+
+// Pinos de Entrada
+#define PEDESTRE 2
+#define SECUNDARIO 3
+bool presencaPedestre = FALSE;
+bool presencaSecundario = FALSE;
+
+//Tamanho das threads
+#define tamanhoThread1 64 //Tamanho em bytes da memória alocada a thread
+#define tamanhoThread2 64
+#define tamanhoThread3 64
+
 
 const int Led1PrincipalVermelho =  6; 
 const int Led2PrincipalAmarelo =  7;
 const int Led3PrincipalVerde =  8;     
 
-const int Led4SecundariaVermelho =  9;
-const int Led5SecundariaAmarelo =  10;
-const int Led6SecundariaVerde =  11;
-
-const int Led7PedestreVermelho =  12; 
-const int Led8PedestreVerde =  13;
-
-void setup() {
-  // put your setup code here, to run once:
-  
-// Inicializando entradas:
-  pinMode(sensorsecundaria, INPUT);
-  pinMode(sensorpedestre, INPUT);
-
-// Inicializando saídaS:
-  pinMode(Led1PrincipalVermelho, OUTPUT);
-  pinMode(Led2PrincipalAmarelo, OUTPUT);
-  pinMode(Led3PrincipalVerde, OUTPUT);
-
-  pinMode(Led4SecundariaVermelho, OUTPUT);
-  pinMode(Led5SecundariaAmarelo, OUTPUT);
-  pinMode(Led6SecundariaVerde, OUTPUT);
-
-  pinMode(Led7PedestreVermelho, OUTPUT);
-  pinMode(Led8PedestreVerde, OUTPUT);
-
-}
-
-void loop() {
-  // put your main code here, to run repeatedly:
 //------------------------------------------------------------------------------
-//                                Thread Contador                             //
-//------------------------------------------------------------------------------
+// Thread 3, leitura da entrada
+//
+//Lê as entradas dos sensores de pedestre e semáforo secundário e atualiza a cada segundo
+static THD_WORKING_AREA(waThread3, tamanhoThread3); 
 
-//Declara área de trabalho e tamanho da memória alocada a essa área
-static THD_WORKING_AREA(waThreadContador, tamanhoThreadContador); 
-
-static THD_FUNCTION(ThreadContador, tempocontador) 
+static THD_FUNCTION(Thread3, arg)
 {//Declara a função do Thread
 
-   while(true)
-    {
-      if (tempocontador>0)
-      {
-        chThdSleepMilliseconds(tempocontador);  //Timer de tempocontador milisegundos
-        tempocontador = 0;
-      }
-      chThdSleepMilliseconds(1000);   //Período aproximado da thread
+  (void)arg;
+
+  while(true)
+    {//Loop infinito
+      presencaPedestre = digitalRead(PEDESTRE);
+      presencaSecundario = digitalRead(SECUNDARIO);
+      chThdSleepMilliseconds(500);
+      if(!presencaPedestre) Serial.println("Tem gente! ");
+      if(!presencaSecundario) Serial.println("Tem carro! ");
+      digitalWrite(LED_BUILTIN, HIGH);
+      chThdSleepMilliseconds(500);
+      digitalWrite(LED_BUILTIN, LOW);
     }
 }
 
+// continua setup() ao chamar chBegin().
+void chSetup() {
+  // Inicializa as threads.
+  /*chThdCreateStatic(waThread1, sizeof(waThread1),
+    NORMALPRIO + 2, Thread1, NULL);
 
+  chThdCreateStatic(waThread2, sizeof(waThread2),
+    NORMALPRIO + 1, Thread2, NULL);
+*/
+  chThdCreateStatic(waThread3, sizeof(waThread3),
+    NORMALPRIO, Thread3, NULL);
+}
+//------------------------------------------------------------------------------
+void setup() {
+  
+  Serial.begin(9600);
+  
+  // Inicializando entradas:
+  pinMode(PEDESTRE, INPUT_PULLUP);
+  pinMode(SECUNDARIO, INPUT_PULLUP);
 
+  // Inicialisa o OS e chama chSetup.
+  chBegin(chSetup);
+  // chBegin() reseta as pilhas e nunca deve retornar.
+  while (true) {}
+}
+//------------------------------------------------------------------------------
+// loop() é a thread principal.  Não utilizada.
+void loop() {
 }
