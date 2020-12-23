@@ -1,5 +1,5 @@
 #include <Arduino.h>
-
+#include "ChRt.h"
 // Pino LED_BUILTIN no Arduino usualmente é o 13.
 
 // Pinos de Entrada
