@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "ChRt.h"
 
 // Pino LED_BUILTIN no Arduino usualmente é o 13.
 
@@ -18,7 +19,45 @@ bool presencaSecundario = FALSE;
 #define Led2PrincipalAmarelo 7;
 #define Led3PrincipalVerde 8;     
 
-const int terminoucontagem =  0;
+int tempocontador =  0;
+int terminoucontagem =  0;
+int estado = 1;
+
+
+//------------------------------------------------------------------------------
+//                             Thread 1: Principal                            //
+//------------------------------------------------------------------------------
+
+static THD_WORKING_AREA(waThread1, tamanhoThread1); 
+
+static THD_FUNCTION(ThreadPrincipal, arg) 
+{//Declara a função do Thread
+
+  (void)arg;
+
+   while(true)
+    {
+      if (estado = 1) {
+        digitalWrite(LED_BUILTIN, HIGH);
+        tempocontador = 1000;
+      
+        if (terminoucontagem=1){
+          estado =2;
+          terminoucontagem=0;
+        }
+      }
+  
+      if (estado = 2) {
+        digitalWrite(LED_BUILTIN, LOW);
+        tempocontador = 1000;
+        if (terminoucontagem=1){
+          estado =1;
+          terminoucontagem=0;
+        }
+      }
+  }
+
+}
 
 //------------------------------------------------------------------------------
 //                              Thread 2: Contador                            //
@@ -27,7 +66,7 @@ const int terminoucontagem =  0;
 
 static THD_WORKING_AREA(waThread2, tamanhoThread2); 
 
-static THD_FUNCTION(ThreadContador, tempocontador) 
+static THD_FUNCTION(ThreadContador, arg) 
 {//Declara a função do Thread
 
   (void)arg;
@@ -41,25 +80,7 @@ static THD_FUNCTION(ThreadContador, tempocontador)
         terminoucontagem = 1;
       }
       chThdSleepMilliseconds(1000);             //Período aproximado da thread
-    }
-  
-
-  if (estado = 1) {
-    digitalWrite(LED_BUILTIN, HIGH);
-    tempocontador = 1000;
-    if (terminoucontagem=1){
-      estado =2;
-      terminoucontagem=0;
-    }
-  }
-  
-  if (estado = 2) {
-    digitalWrite(LED_BUILTIN, LOW);
-    tempocontador = 1000;
-    if (terminoucontagem=1){
-      estado =1;
-      terminoucontagem=0;
-    }
+    
   }
 
 }
@@ -70,10 +91,10 @@ static THD_FUNCTION(ThreadContador, tempocontador)
 //
 //Lê as entradas dos sensores de pedestre e semáforo secundário e atualiza a cada segundo
 static THD_WORKING_AREA(waThread3, tamanhoThread3); 
-
+  
 static THD_FUNCTION(Thread3, arg)
 {//Declara a função do Thread
-
+  chThdSleepMilliseconds(20);
   (void)arg;
 
   while(true)
