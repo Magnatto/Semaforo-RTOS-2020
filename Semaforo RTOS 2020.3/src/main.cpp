@@ -14,10 +14,11 @@ bool presencaSecundario = FALSE;
 #define tamanhoThread3 64
 
 
-const int Led1PrincipalVermelho =  6; 
-const int Led2PrincipalAmarelo =  7;
-const int Led3PrincipalVerde =  8;     
+#define Led1PrincipalVermelho  6; 
+#define Led2PrincipalAmarelo 7;
+#define Led3PrincipalVerde 8;     
 
+const int terminoucontagem =  0;
 
 //------------------------------------------------------------------------------
 //                              Thread 2: Contador                            //
@@ -37,15 +38,30 @@ static THD_FUNCTION(ThreadContador, tempocontador)
       {
         chThdSleepMilliseconds(tempocontador);  //Timer de tempocontador milisegundos
         tempocontador = 0;
+        terminoucontagem = 1;
       }
-      chThdSleepMilliseconds(1000);   //Período aproximado da thread
-
+      chThdSleepMilliseconds(1000);             //Período aproximado da thread
     }
+  
 
-  digitalWrite(LED_BUILTIN, HIGH);
-  tempocontador = 500;
-  digitalWrite(LED_BUILTIN, LOW);
-  tempocontador = 500;
+  if (estado = 1) {
+    digitalWrite(LED_BUILTIN, HIGH);
+    tempocontador = 1000;
+    if (terminoucontagem=1){
+      estado =2;
+      terminoucontagem=0;
+    }
+  }
+  
+  if (estado = 2) {
+    digitalWrite(LED_BUILTIN, LOW);
+    tempocontador = 1000;
+    if (terminoucontagem=1){
+      estado =1;
+      terminoucontagem=0;
+    }
+  }
+
 }
 
 
