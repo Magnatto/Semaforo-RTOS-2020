@@ -24,6 +24,7 @@ const int Led3PrincipalVerde =  8;
 //Lê as entradas dos sensores de pedestre e semáforo secundário e atualiza a cada segundo
 static THD_WORKING_AREA(waThread3, tamanhoThread3); 
 
+
 static THD_FUNCTION(Thread3, arg)
 {//Declara a função do Thread
 
