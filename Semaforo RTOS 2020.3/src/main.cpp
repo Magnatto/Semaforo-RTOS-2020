@@ -19,9 +19,11 @@ bool presencaSecundario = FALSE;
 #define Led2PrincipalAmarelo 7;
 #define Led3PrincipalVerde 8;     
 
+int ativarcontador = 0;
 int tempocontador =  0;
 int terminoucontagem =  0;
-int estado = 1;
+
+int estado = 0;
 
 
 //------------------------------------------------------------------------------
@@ -30,29 +32,31 @@ int estado = 1;
 
 static THD_WORKING_AREA(waThread1, tamanhoThread1); 
 
-static THD_FUNCTION(ThreadPrincipal, arg) 
+static THD_FUNCTION(Thread1, arg) 
 {//Declara a função do Thread
 
   (void)arg;
 
    while(true)
     {
-      if (estado = 1) {
-        digitalWrite(LED_BUILTIN, HIGH);
-        tempocontador = 1000;
+      
+      if (!estado) {
+
+        digitalWrite(13, HIGH);
+      
+      ativarcontador = 1;
+      tempocontador = 5000;
       
         if (terminoucontagem=1){
           estado =2;
-          terminoucontagem=0;
         }
       }
   
-      if (estado = 2) {
-        digitalWrite(LED_BUILTIN, LOW);
-        tempocontador = 1000;
+      if (estado) {
+        digitalWrite(13, LOW);
+        tempocontador = 5000;
         if (terminoucontagem=1){
           estado =1;
-          terminoucontagem=0;
         }
       }
   }
@@ -66,17 +70,18 @@ static THD_FUNCTION(ThreadPrincipal, arg)
 
 static THD_WORKING_AREA(waThread2, tamanhoThread2); 
 
-static THD_FUNCTION(ThreadContador, arg) 
+static THD_FUNCTION(Thread2, arg) 
 {//Declara a função do Thread
 
   (void)arg;
 
    while(true)
     {
-      if (tempocontador>0)
+      if (ativarcontador)
       {
         chThdSleepMilliseconds(tempocontador);  //Timer de tempocontador milisegundos
         tempocontador = 0;
+        ativarcontador = 0;
         terminoucontagem = 1;
       }
       chThdSleepMilliseconds(1000);             //Período aproximado da thread
@@ -113,12 +118,12 @@ static THD_FUNCTION(Thread3, arg)
 // continua setup() ao chamar chBegin().
 void chSetup() {
   // Inicializa as threads.
-  /*chThdCreateStatic(waThread1, sizeof(waThread1),
+  chThdCreateStatic(waThread1, sizeof(waThread1),
     NORMALPRIO + 2, Thread1, NULL);
-
+  
   chThdCreateStatic(waThread2, sizeof(waThread2),
     NORMALPRIO + 1, Thread2, NULL);
-*/
+
   chThdCreateStatic(waThread3, sizeof(waThread3),
     NORMALPRIO, Thread3, NULL);
 }
@@ -130,6 +135,8 @@ void setup() {
   // Inicializando entradas:
   pinMode(PEDESTRE, INPUT_PULLUP);
   pinMode(SECUNDARIO, INPUT_PULLUP);
+
+  pinMode(13, OUTPUT);
 
   // Inicialisa o OS e chama chSetup.
   chBegin(chSetup);
